@@ -8,7 +8,7 @@ import '../../../node_modules/font-awesome/css/font-awesome.min.css';
 import AnodiamTooltipBody from "../GenericComponents/AnodiamTooltipBody";
 import { Navigate } from 'react-router-dom';
 import AskForForgetPassword from '../GenericComponents/AskForForgetPassword';
-import AskForSocialLogin from '../GenericComponents/AskForSocialLogin';
+import AnodiamGoogleLogin from '../AnodiamLogin/AnodiamGoogleLogin';
 
 const AnodiamRegister = () => {
 
@@ -133,7 +133,7 @@ const AnodiamRegister = () => {
             <AnodiamTooltipBody title="Must be between 6 to 40 characters containing lower case letters (a-z), upper case letters (A-Z), numerals (0-9) and special characters (@,#,$,%,^,&,+,=) but not your name or email.">
             <i className="fa fa-question-circle anodiam-help-button"></i></AnodiamTooltipBody></label>
             <input 
-              className="form-control" type="password" id="regoPassword"
+              className="form-control" type="password" id="regoPassword" autocCmplete="off"
               required value={password} onChange={(e) => setPassword(e.target.value)} 
               onCut={stopChange} onCopy={stopChange} onPaste={stopChange}
             />
@@ -144,7 +144,7 @@ const AnodiamRegister = () => {
             <i className={(password === confirmPassword && password.length >= 8) ? "fa fa-check success-message" : ""} aria-hidden="true"></i>
             { errorConfPassword && <span className="mandatory">&nbsp;&nbsp;{ errorConfPassword }</span> }</label>
             <input
-              className="form-control" type="password" id="confPassword"
+              className="form-control" type="password" id="confPassword" autoComplete="off"
               required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} 
               onCut={stopChange} onCopy={stopChange} onPaste={stopChange}
             />
@@ -156,13 +156,13 @@ const AnodiamRegister = () => {
             <input type="checkbox" onClick={toggleShowHidePassword} />
             <span className="anodiam-form-checkmark"></span></label>
                             
-            { !isPending && <button className="btn btn-primary btn-block">Register New User</button> }
-            { isPending && <button disabled className="btn btn-primary btn-block btn-disabled">
+            { !isPending && <button className="btn btn-primary btn-block" style={{width: '399px', marginLeft: '-11px', borderRadius: '4px' }}>Register New User</button> }
+            { isPending && <button disabled className="btn btn-primary btn-block btn-disabled" style={{width: '399px', marginLeft: '-11px', borderRadius: '4px' }}>
               Registering {firstName}...</button> }
           </div>
+          <AnodiamGoogleLogin />
         </form>
       </div>
-      <AskForSocialLogin />
       <AskForLogin />
       <AskForForgetPassword />
     </>

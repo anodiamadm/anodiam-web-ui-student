@@ -1,33 +1,72 @@
 import PageHeading from "../GenericComponents/PageHeading";
-import { useContext } from "react";
-import { AuthContext } from "../../contexts/AuthContext";
 import AskForRegister from "../GenericComponents/AskForRegister";
 import AskForForgetPassword from '../GenericComponents/AskForForgetPassword';
+import AnodiamFormLogin from "./AnodiamFormLogin";
+import { useState, useEffect, useContext } from "react";
+import AnodiamGoogleLogin from "./AnodiamGoogleLogin";
+import { AuthContext } from "../../contexts/AuthContext";
+import { getUrl } from "../../utils/UrlUtils";
 
 const AnodiamLogin = () => {
-  const { dispatch } = useContext(AuthContext);
-  const doLogin = () => dispatch({type: 'LOGIN',
-    // Authentication Object authObj has to be procured from ANODIAM GATEWAY SERVICE through a fetch.
-    authObj: {
-      // email has to be fetched from google (oauth2) or UI (local login)
-      email: 'pinaki.sen@yahoo.com',
-      authProvider: 'FACEBOOK',
-      given_name: 'Pinaki',
-      family_name: 'Sen',
-      JWT: 'ejfnvn32r934urngj54gn5638yu6gj54jg54jkxsad09009',
-      expires_on: 1663036724324,
-      valid: true
-    }});
+  const [credentials, setCredentials] = useState({ email: '', password: '', provider: '' });
+  const [error, setError] = useState('');
+  const [isPending, setIsPending] = useState(false);
+  const {dispatch} = useContext(AuthContext);
+  const url = getUrl('loginUrl');
+
+  useEffect(()=>{
+    setIsPending(true);
+    const abortCont = new AbortController();
+    fetch(url, {
+      crossDomain: true,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+        signal: abortCont.signal
+      }).then(res => {
+        if (res.ok || res.status===400 || res.status===500) {
+          return res.json();
+        } else {
+          throw Error(res.status);
+        }
+      }).then(jsonData => {
+        setIsPending(false);
+        if(jsonData.ok === true) {
+          console.log('DISPATCH LOGIN with JSON Data');
+          dispatch({type: 'LOGIN', authObj: jsonData.Data});
+          setError('')
+        } else {
+          setError(`HTTP Error: ${jsonData.message}`);
+          console.log('DISPATCH LOGOUT');
+          dispatch({type: 'LOGOUT', authObj: jsonData.Data});
+        }
+      }).catch(err => {
+        if(err.name === 'AbortError') {
+          return () => abortCont.abort();
+        } else {
+          setError(`HTTP Error: ${err.message}`);
+          dispatch({type: 'LOGOUT', authObj: {email: '', authProvider: '', given_name: '', family_name: '', JWT: '', expires_on: '', valid: false}});
+        }
+      }).finally(() => {
+        setIsPending(false);
+      }
+    );
+  }, [credentials, url, dispatch]);
+
   return ( 
     <>
       <div>
         <PageHeading heading='Login Page' />
         <div className="anodiam-body-panel-mid">
-          <h2>Default Home Page</h2>
-          <p>Login Page...</p>
+
+          { error!=='' && <div className="mandatory center-align">{ error }</div> }
+          
+          <AnodiamFormLogin setCredentials={setCredentials} isPending={isPending} />
+
+          <AnodiamGoogleLogin setCredentials={setCredentials} setError={setError} />
+          
         </div>
-        <button onClick={doLogin}>Log In</button>
-      </div>
+      </div>      
       <AskForRegister />
       <AskForForgetPassword />
     </>
