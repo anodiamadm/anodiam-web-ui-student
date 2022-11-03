@@ -16,41 +16,42 @@ const AnodiamLogin = () => {
 
   useEffect(()=>{
     setIsPending(true);
-    const abortCont = new AbortController();
-    fetch(url, {
-      crossDomain: true,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials),
-        signal: abortCont.signal
-      }).then(res => {
-        if (res.ok || res.status===400 || res.status===500) {
-          return res.json();
-        } else {
-          throw Error(res.status);
-        }
-      }).then(jsonData => {
-        setIsPending(false);
-        if(jsonData.ok === true) {
-          console.log('DISPATCH LOGIN with JSON Data');
-          dispatch({type: 'LOGIN', authObj: jsonData.Data});
-          setError('')
-        } else {
-          setError(`HTTP Error: ${jsonData.message}`);
-          console.log('DISPATCH LOGOUT');
-          dispatch({type: 'LOGOUT', authObj: jsonData.Data});
-        }
-      }).catch(err => {
-        if(err.name === 'AbortError') {
-          return () => abortCont.abort();
-        } else {
-          setError(`HTTP Error: ${err.message}`);
-          dispatch({type: 'LOGOUT', authObj: {email: '', authProvider: '', given_name: '', family_name: '', JWT: '', expires_on: '', valid: false}});
-        }
-      }).finally(() => {
-        setIsPending(false);
-      }
-    );
+    // const abortCont = new AbortController();
+    console.log(`CRED: ${credentials.email}, ${credentials.provider}, ${credentials.password}`);
+    // fetch(url, {
+    //   crossDomain: true,
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(credentials),
+    //     signal: abortCont.signal
+    //   }).then(res => {
+    //     if (res.ok || res.status===400 || res.status===500) {
+    //       return res.json();
+    //     } else {
+    //       throw Error(res.status);
+    //     }
+    //   }).then(jsonData => {
+    //     setIsPending(false);
+    //     if(jsonData.ok === true) {
+    //       console.log('DISPATCH LOGIN with JSON Data');
+    //       dispatch({type: 'LOGIN', authObj: jsonData.Data});
+    //       setError('')
+    //     } else {
+    //       setError(`HTTP Error: ${jsonData.message}`);
+    //       console.log('DISPATCH LOGOUT');
+    //       dispatch({type: 'LOGOUT', authObj: jsonData.Data});
+    //     }
+    //   }).catch(err => {
+    //     if(err.name === 'AbortError') {
+    //       return () => abortCont.abort();
+    //     } else {
+    //       setError(`HTTP Error: ${err.message}`);
+    //       dispatch({type: 'LOGOUT', authObj: {email: '', authProvider: '', given_name: '', family_name: '', JWT: '', expires_on: '', valid: false}});
+    //     }
+    //   }).finally(() => {
+    //     setIsPending(false);
+    //   }
+    // );
   }, [credentials, url, dispatch]);
 
   return ( 

@@ -8,7 +8,18 @@ const AnodiamGoogleLogin = ({setCredentials, setError}) => {
 
   useEffect(() => {
     const handleCallbackResponse = (response) => {
-      setCredentials({email: jwtDecode(response.credential).email, password: '', provider: 'GOOGLE'});
+      console.log(`RESPO: ${response.credential}`);
+      console.log(`USER:`);
+      console.log(`NAME: ${jwtDecode(response.credential).name}`);
+      console.log(`GIVEN NAME: ${jwtDecode(response.credential).given_name}`);
+      console.log(`FAMILY NAME: ${jwtDecode(response.credential).family_name}`);
+      console.log(`EMAIL: ${jwtDecode(response.credential).email}`);
+      console.log(`PICTURE(URL): ${jwtDecode(response.credential).picture}`);
+      console.log(`JWT TOKEN: VALUE: ${jwtDecode(response.credential).nonce}`);
+      console.log(`JWT TOKEN: ISSUE TIME: ${jwtDecode(response.credential).iat}`);
+      console.log(`JWT TOKEN: EXPIRES TIME: ${jwtDecode(response.credential).exp}`);
+      console.log(`AUTHORITIES: ${jwtDecode(response.credential).authorities}`);
+      setCredentials({email: jwtDecode(response.credential).email, password: '', provider: jwtDecode(response.credential).iss});
     }
     try {
       /* global google */
